@@ -1,0 +1,55 @@
+﻿@using Infrastructure.Entities;
+@using Microsoft.AspNetCore.Http;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject IHttpContextAccessor HttpContextAccessor
+@model UserViewModel
+@using MiniForum.Models
+@{
+    var httpContext = HttpContextAccessor.HttpContext;
+    var userJson = httpContext.Session.GetString("User");
+    var user = JsonConvert.DeserializeObject<User>(userJson);
+    var avatar = user?.Avatar ?? null;
+    var userName = user?.Name ?? "";
+    var userId = user.UserID;
+    
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/updateinfor.css">
+</head>
+<div>
+    <div class="frame">
+        <div class="login-nav">
+            <ul>
+                <li class="signin-active login-li"><a class="btn">Cập nhật thông tin tài khoản</a></li>
+                <li class="signin-active login-li"><a class="btn">User ID: @userId</a></li>
+                </br>
+                <li class="signin-active login-li"><a class="btn">User Name: @userName</a></li>
+            </ul>
+        </div>
+        </br>
+        <div ng-app ng-init="checked = false">
+            <form asp-action="UpdateInformation" asp-controller="User" class="form-signin"  method="post" name="form">
+
+                <input type="hidden" asp-for="@Model.UserID" value="@userId" />
+                <input type="hidden" asp-for="@Model.Name" value="@userName" />
+
+
+                <label class="login-label" for="username"> Ảnh dại diện</label>
+              
+                <input asp-for="@Model.Avatar" class="form-styling" type="text" placeholder="Hình ảnh (Lưu dưới dạng link)" />
+                <label class="login-label" for="password">Mật khẩu mới</label>
+
+        
+                <input asp-for="@Model.PassWord" class="form-styling" type="text" placeholder="Mật khẩu" />
+
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane" aria-hidden="true"></i> Cập nhật</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    </div>

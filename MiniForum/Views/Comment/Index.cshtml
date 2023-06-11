@@ -1,0 +1,353 @@
+﻿@using Infrastructure.Entities;
+@using Microsoft.AspNetCore.Http;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject IHttpContextAccessor HttpContextAccessor
+@model MiniForum.Models.Post_CommentViewModel
+
+@using MiniForum.Models
+@using System.IO;
+
+@{
+    var httpContext = HttpContextAccessor.HttpContext;
+    var userJson = httpContext.Session.GetString("User");
+    var user = JsonConvert.DeserializeObject<User>(userJson);
+    var avatar = user?.Avatar ?? null;
+    var userName = user?.Name ?? "";
+    var userId = user.UserID;
+    
+}
+
+@{
+    ViewData["Title"] = "Mini Forum";
+}
+
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <div class="face-card-header" style="display: inline-block;">
+                <img class="face-card-user-image" src="@avatar">
+                <p class="face-card-user-name" style="display: inline-block">@userName</p>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<div class="face-card">
+    <div class="face-card-header" style="display: inline-block;">
+        <img class="face-card-user-image" src="@Model.postViewModel.User.Avatar">
+        <p class="face-card-user-name" style="display: inline-block">@Model.postViewModel.User.Name</p> 
+    </div>
+   
+    <div class="post-caption">
+        <p> @Model.postViewModel.Caption</p>
+    </div>
+    @if (@Model.postViewModel.Photo != null)
+    {
+        using (var memoryStream = new MemoryStream())
+        {
+            Model.postViewModel.Photo.CopyTo(memoryStream);
+            var imageBytes = memoryStream.ToArray();
+            var base64String = Convert.ToBase64String(imageBytes);
+
+            <img src="data:image;base64,@base64String" style="object-fit: cover; width: 100%; height: auto; max-height: 100%;" />
+        }
+    }
+
+    else
+    {
+
+        <img src="" />
+
+    }
+
+
+        <div class="face-card-comment">
+            <style>
+            .comment-container {
+                display: flex;
+                align-items: center;
+            }
+
+                .comment-container input {
+                    flex: 1;
+                }
+
+            .submit-button {
+                border: none;
+                background: none;
+                cursor: pointer;
+            }
+
+                .submit-button i {
+                    color: #000;
+                }
+
+        </style>
+
+
+        <style>
+            #app {
+                background-color: #fff;
+                font-family: helvetica;
+                margin: 30px auto;
+                width: 500px;
+                border: 1px solid;
+                border-color: #e5e6e9 #dfe0e4 #d0d1d5;
+                border-radius: 3px;
+            }
+
+            .creator {
+                position: relative;
+            }
+
+                .creator img {
+                    width: 40px;
+                    height: 40px;
+                    background-image: url(http://cp91279.biography.com/1000509261001/1000509261001_1822909398001_BIO-Biography-29-Innovators-Mark-Zuckerberg-115956-SF.jpg);
+                    background-size: cover;
+                    background-position: center;
+                    margin: 12px 0 0 12px;
+                    position: absolute;
+                }
+
+                .creator div {
+                    display: inline-block;
+                    margin-left: 60px;
+                }
+
+                    .creator div p {
+                        font-size: 14px;
+                    }
+
+                        .creator div p:first-of-type {
+                            cursor: pointer;
+                            font-weight: bold;
+                            color: #365899;
+                        }
+
+                            .creator div p:first-of-type:hover {
+                                text-decoration: underline;
+                            }
+
+                        .creator div p:last-of-type {
+                            font-size: 12px;
+                            color: #90949c;
+                            margin-top: -10px;
+                        }
+
+            .message {
+                font-size: 14px;
+                margin-top: 8px;
+                padding: 0 12px;
+                line-height: 18px;
+            }
+
+            .bar {
+                width: calc(100% - 24px);
+                border-top: 1px solid #e5e5e5;
+                margin: 0 12px;
+            }
+
+                .bar .action-button {
+                    margin-left: 20px;
+                    display: inline-block;
+                    font-size: 12px;
+                    font-weight: bold;
+                    color: #7f7f7f;
+                    cursor: pointer;
+                }
+
+                    .bar .action-button:before {
+                        content: '';
+                        background-image: url(https://www.facebook.com/rsrc.php/v2/yo/r/7-oMGl7sBZ-.png);
+                        display: inline-block;
+                        height: 14px;
+                        margin: 0 6px -3px 0;
+                        width: 14px;
+                        background-repeat: no-repeat;
+                        background-size: auto;
+                    }
+
+                    .bar .action-button:first-of-type {
+                        margin: 0;
+                    }
+
+                        .bar .action-button:first-of-type:before {
+                            content: '';
+                            background-position: -47px -164px;
+                        }
+
+                    .bar .action-button:nth-of-type(2):before {
+                        background-position: -32px -164px;
+                    }
+
+                    .bar .action-button:nth-of-type(3):before {
+                        background-position: -45px -181px;
+                    }
+
+                    .bar .action-button:hover {
+                        text-decoration: underline;
+                    }
+
+            .single-comment {
+                padding: 0 0 0 12px;
+                margin: 0;
+            }
+
+                .single-comment:first-of-type {
+                    border-top: 1px solid #e1e2e3;
+                    padding-top: 12px;
+                }
+
+                    .single-comment:first-of-type img {
+                        background-image: url(http://static.srcdn.com/slir/w730-h383-q90-c730:383/wp-content/uploads/Batman-Movies-Worst-Moments.jpg);
+                    }
+
+                .single-comment:nth-of-type(2) img {
+                    background-image: url(http://cp91279.biography.com/1000509261001/1000509261001_1822909398001_BIO-Biography-29-Innovators-Mark-Zuckerberg-115956-SF.jpg);
+                }
+
+                .single-comment img {
+                    position: absolute;
+                    width: 32px;
+                    height: 32px;
+                    background-image: url(https://heatherchristenaschmidt.files.wordpress.com/2011/09/facebook_no_profile_pic2-jpg.gif);
+                    background-size: cover;
+                    background-position: center;
+                    border: none;
+                }
+
+                .single-comment .single-container {
+                    padding-left: 40px;
+                    padding-right: 20px;
+                }
+
+                    .single-comment .single-container span {
+                        font-size: 12px;
+                        margin-left: 5px;
+                    }
+
+                        .single-comment .single-container span:first-of-type {
+                            cursor: pointer;
+                            font-weight: bold;
+                            color: #365899;
+                            font-size: 12px;
+                            margin: 0;
+                        }
+
+                            .single-comment .single-container span:first-of-type:hover {
+                                text-decoration: underline;
+                            }
+
+                .single-comment .buttons {
+                    margin-top: 0;
+                    padding-left: 40px;
+                }
+
+                    .single-comment .buttons p {
+                        display: inline-block;
+                        color: #365899;
+                        cursor: pointer;
+                        text-decoration: none;
+                        font-size: 12px;
+                        margin-right: 8px;
+                        margin-top: 5px;
+                    }
+
+                        .single-comment .buttons p:hover {
+                            text-decoration: underline;
+                        }
+
+                        .single-comment .buttons p:last-of-type {
+                            color: #90949c;
+                            cursor: auto;
+                            text-decoration: none;
+                        }
+
+            .comment-section {
+                background-color: #f6f7f9;
+                margin: 0;
+            }
+
+            .input {
+                margin-top: 0;
+                background-color: #f6f7f9;
+                padding: 4px 12px 8px 12px;
+            }
+
+                .input img {
+                    width: 32px;
+                    height: 32px;
+                    background-image: url(https://heatherchristenaschmidt.files.wordpress.com/2011/09/facebook_no_profile_pic2-jpg.gif);
+                    background-size: cover;
+                    background-position: center;
+                    border: none;
+                    position: absolute;
+                }
+
+                .input textarea {
+                    background: #fff;
+                    border: 1px solid #bdc7d8;
+                    box-sizing: border-box;
+                    cursor: text;
+                    width: calc(100% - 40px);
+                    margin-left: 40px;
+                    padding: 7px;
+                    font-family: helvetica;
+                    outline: none;
+                    resize: none;
+                    overflow: hidden;
+                    height: 32px;
+                }
+            </style>
+        <hr style="border: 1px solid black; margin: 10px 0;">
+        <form asp-controller="Comment" asp-action="Create" method="post">
+            <input type="hidden" asp-for="@Model.commentViewModel.PostID" value="@ViewBag.PostId" />
+            <input type="hidden" asp-for="@Model.commentViewModel.UserID" value="@userId" />
+            <input type="hidden" asp-for="@Model.commentViewModel.CmtID" />
+            <div class="comment-container">
+                <input asp-for="@Model.commentViewModel.Content" class="face-card-input" placeholder="Write a comment" />
+                <button type="submit" class="submit-button"><i class="fa fa-paper-plane"></i></button>
+            </div>
+        </form>
+
+        <hr style="border: 1px solid black; margin: 10px 0;">
+        @foreach (var comment in @Model.postViewModel.Comments)
+        {
+            <div>
+                <div class="comment-section">
+                    <div class="single-comment">
+                      
+                        <img class="face-card-user-image" src="@comment.User.Avatar">
+                        <div class="single-container">
+                            <span>@comment.User.Name</span>
+                            <span>@comment.Content</span>
+                            @if (comment.UserID == userId || Model.postViewModel.User.UserID==userId )
+                            {
+                                <form asp-controller="Comment" asp-action="Delete" method="post" class="d-inline" style="float:right;">
+                                      <input type="hidden" asp-for="commentViewModel.PostID" value="@comment.PostID" />
+                                    <input type="hidden" asp-for="commentViewModel.UserID" value="@comment.UserID" />
+                                    <input type="hidden" asp-for="commentViewModel.CmtID" value="@comment.CmtID" />
+                                    <button type="submit" style="border:none; background-color: white">
+                                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                        <div class="buttons">
+                            <p class="action-button"></p>
+                            <p class="action-button"></p>
+                            <p   >
+                              
+                            </p>
+                        </div>
+                    </div>
+                   </div>
+            </div>
+     
+        }
+        </div>
+    </div>
+
+    </>

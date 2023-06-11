@@ -1,0 +1,52 @@
+﻿
+@model UserViewModel
+
+@{
+    Layout = null;
+}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Fake Book </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/login.css" />
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+@if (TempData["ErrorMessage"] != null)
+{
+
+    <div class="alert alert-success alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <strong>Fail</strong>     @TempData["ErrorMessage"]
+    </div>
+}
+<body>
+    <div class="textbox">
+        <h1>
+            Fake Book
+        </h1>
+        <h2>
+            Kết nối với mọi người trên toàn thế giới<br>xung quanh với bạn trên Sách mặt.
+        </h2>
+    </div>
+
+    <div class="container">
+        <div class="form">
+            <form method="post" asp-action="Login" asp-controller="User" >
+                <input asp-for="@Model.Name"  class="text" placeholder="Tên đăng nhập"> <br>
+                <input asp-for="@Model.PassWord"  type="password" class="text" placeholder="Mật khẩu"><br>
+                <button type="submit">
+                    Đăng nhập
+                </button>
+               
+            </form>
+            <a asp-controller="User" asp-action="SignUp">Chưa có tài khoản? Đăng ký tại đây.</a>
+
+        
+        </div>
+    </div>
+</body>

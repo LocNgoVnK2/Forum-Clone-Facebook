@@ -1,0 +1,108 @@
+﻿@{
+    Layout = null;
+}
+@model UserViewModel
+<head>
+
+    <link rel="stylesheet" href="~/css/signup.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <nav id="nav">
+        <ul class="left-ul">
+            <li><a href="">Sách mặt</a></li>
+        </ul>
+        <div class="empty"></div>
+
+    </nav>
+    <!-- Close nav -->
+   
+
+
+    <div class="container">
+        <div class="left-section">
+            <div class="left-heading">
+                <h3>Sách mặt giúp bạn kết nối và chia sẽ với mọi người về cuộc sống của bạn.</h3>
+                <div class="image">
+                    <img src="https://img.freepik.com/premium-photo/facebook-symbol-screen-smartphone-mobile-3d-render-facebook-reactions-love-wow-like-emoji-3d-render_41204-1491.jpg?w=996" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="right-section">
+            <h1 class="form-heading">
+                Tạo tài khoản
+            </h1>
+            
+            <button id="generate" class="btn btn-primary">Lấy mã đăng ký</button>
+ 
+            <div id="code"></div>
+            <p class="text">Nó hoàn toàn miễn phí và sau này cũng vậy.</p>
+            <form method="post" asp-action="SignUp" asp-controller="User" id="formSection">
+                <div class="form-group">      
+                    <input asp-for="@Model.UserID" type="text" class="control" placeholder="Nhập mã đăng ký." maxlength="5" required>
+                </div>
+
+                <div class="form-group">
+                    <input asp-for="@Model.Name" type="text" class="control" placeholder="Tên đăng nhập" required>
+                </div>
+                <div class="form-group">
+                    <input asp-for="@Model.PassWord" type="password" class="control" placeholder="Mật khẩu" minlength="6" required>
+                    <small class="form-text text-muted">Mật khẩu phải có ít nhất 6 ký tự.</small>
+                </div>
+
+                <div class="form-group">
+                    <p class="someText">Bấm để đăng ký.</p>
+                </div>
+                <div class="form-group">
+                    <button type="submit"  class="btn">Đăng ký</button>
+                </div>
+
+            </form>
+
+
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    @ViewBag.ErrorMessage
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+            }
+ 
+         
+        </div>
+    </div>
+   
+</body>
+
+<script>
+ 
+    function generateCode() {
+        let code = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const codeLength = 5;
+
+        for (let i = 0; i < codeLength; i++) {
+            code += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+
+        return code;
+    }
+
+    function setCode() {
+        const codeDiv = document.querySelector('#code');
+        codeDiv.textContent = generateCode();
+    }
+
+  
+    const generateButton = document.querySelector('#generate');
+    generateButton.addEventListener('click', setCode);
+
+   
+</script>

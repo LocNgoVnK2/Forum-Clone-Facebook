@@ -1,0 +1,125 @@
+﻿@using Infrastructure.Entities;
+@using Microsoft.AspNetCore.Http;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject IHttpContextAccessor HttpContextAccessor
+@model MiniForum.Models.User_FollowViewModel
+
+@using MiniForum.Models
+@using System.IO;
+
+@{
+    var httpContext = HttpContextAccessor.HttpContext;
+    var userJson = httpContext.Session.GetString("User");
+    var user = JsonConvert.DeserializeObject<User>(userJson);
+    var avatar = user?.Avatar ?? null;
+    var userName = user?.Name ?? "";
+    var userId = user.UserID;
+
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+<div id="friendList">
+    @foreach (User Friend in Model.users)
+    {
+        @if (userId != Friend.UserID)
+        {
+            <div class='friend'>
+                <img src='@Friend.Avatar'>
+                <span class='name'>@Friend.Name</span>
+                <div class="buttons">
+                    @if (Model.friendFollows.Any(follow => follow.UserID1 == userId && follow.UserID2 == Friend.UserID) )
+                    {
+
+                        <form method="post" asp-action="DeleteFollow" asp-controller="FriendFollow">
+                            <input type="hidden" name="UserID1" value="@userId" />
+                            <input type="hidden" name="UserID2" value="@Friend.UserID" />
+                            <button type="submit" class='delete-button'>Unfollow</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form method="post" asp-action="CreateFollow" asp-controller="FriendFollow">
+                            <input type="hidden" asp-for="UserID1" value="@userId" />
+                            <input type="hidden" asp-for="UserID2" value="@Friend.UserID" />
+                            <button type="submit" class='add-button'>follow</button>
+                           
+                        </form>
+                     
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<style>
+    #friendList {
+        font-size: 13px;
+        width: 80%;
+        border: solid 1px gray;
+        border-radius: 2px;
+        margin: auto;
+        margin-top: 2em;
+    }
+
+        #friendList .friend {
+            cursor: pointer;
+            position: relative;
+            font-family: 'Playfair Display', serif;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: solid 1px rgba(0, 0, 0, .1);
+            width: 100%;
+            height:100px;
+        }
+
+            #friendList .friend:hover {
+                background: rgba(0, 0, 100, 0.08);
+            }
+
+            #friendList .friend img {
+                display: inline;
+                padding: 5px;
+                width: 100px;
+                height: 100px;
+                vertical-align: middle;
+            }
+
+            #friendList .friend .name {
+                vertical-align: middle;
+            }
+
+            #friendList .friend .buttons {
+                display: flex;
+                align-items: center;
+            }
+
+                #friendList .friend .buttons button {
+                    margin-left: 5px;
+                }
+
+            #friendList .friend .state {
+                margin-top: 11px;
+                margin-right: 11px;
+                color: gray;
+                vertical-align: middle;
+                font-size: 12px;
+                font-family: sans-serif;
+                font-style: italic;
+            }
+
+                #friendList .friend .state .time {
+                    display: none;
+                    margin-right: 5px;
+                    font-size: 10px;
+                }
+
+            #friendList .friend:hover .state .time {
+                display: inline;
+            }
+
+            #friendList .friend .state.online {
+                color: limegreen;
+            }
+</style>

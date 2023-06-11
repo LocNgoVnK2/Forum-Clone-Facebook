@@ -1,0 +1,98 @@
+﻿@using System.IO;
+@using Infrastructure.Entities;
+@using Microsoft.AspNetCore.Http;
+@using Newtonsoft.Json;
+@using Microsoft.AspNetCore.Mvc.Rendering
+@inject IHttpContextAccessor HttpContextAccessor
+@model PostViewModel
+@using MiniForum.Models
+@{
+    var httpContext = HttpContextAccessor.HttpContext;
+    var userJson = httpContext.Session.GetString("User");
+    var user = JsonConvert.DeserializeObject<User>(userJson);
+    var avatar = user?.Avatar ?? null;
+    var userName = user?.Name ?? "";
+    var userId = user.UserID;
+    
+
+}
+<form method="post" asp-action="AddOrEdit" asp-controller="Post" asp-route-id="@Model.PostID"  enctype="multipart/form-data" class="post-form">
+    <input type="hidden" asp-for="@Model.PostID" value="@Model.PostID" />
+    <div class="face-card">
+        <div class="face-card-header">
+            <img class="face-card-user-image" src="@avatar">
+            <p class="face-card-user-name" href="https://www.facebook.com/perhapsyouneedalittleguatemala/?hc_ref=ARRZ7X-XyIK95Pr7HSCNgp63oEmaVVITYfsqdIIL88sg4ywPPLWbesooohMhpLtk4sU&fref=nf">@userName<br></p>
+        </div>
+        <div class="form-group caption-group">
+            <input asp-for="@Model.UserID" value="@userId" type="hidden" />
+          
+            <div class="d-flex align-items-center">
+                <input asp-for="@Model.Caption" value="@Model.Caption" class="face-card-input mr-2" placeholder="Nhập nội dung đăng" />
+                <div class="input--file"><span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" /><path d="M9 2l-1.83 2h-3.17c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2h-3.17l-1.83-2h-6zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" /><path d="M0 0h24v24h-24z" fill="none" /></svg></span><input asp-for="@Model.Photo" type="file" class="form-control-file" id="file" value="@Model.Photo"></div>
+            </div>
+            <span asp-validation-for="@Model.Caption" class="text-danger"></span>
+        </div>
+        <div class="form-group photo-group">
+            @if (Model.Photo != null)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    Model.Photo.CopyTo(memoryStream);
+                    var imageBytes = memoryStream.ToArray();
+                    var base64String = Convert.ToBase64String(imageBytes);
+
+                    <div class="image-container" style="position: relative;">
+                        <img id="preview-image" src="data:image;base64,@base64String" style="object-fit: cover; width: 100%; height: auto; max-height: 100%;" />
+                        <button type="button" class="btn btn-danger remove-photo" ><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="image-container" style="position: relative;">
+                    <img id="preview-image" src="" style="object-fit: cover; width: 100%; height: auto; max-height: 100%;" />
+                    <button type="button" class="btn btn-danger remove-photo" style="display:none"><i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                </div>
+            }
+            <span asp-validation-for="@Model.Photo" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary"><i class="fa fa-paper-plane" aria-hidden="true"></i> Đăng</button>
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        var imageFileInput = document.getElementById('file');
+        var previewImage = document.getElementById('preview-image');
+        var removePhotoButton = document.querySelector('.remove-photo');
+
+        imageFileInput.addEventListener('change', function () {
+            var file = imageFileInput.files[0];
+            var reader = new FileReader();
+
+            reader.addEventListener('load', function () {
+                previewImage.src = reader.result;
+                removePhotoButton.style.display = 'inline-block'; // show the remove button
+            });
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removePhotoButton.addEventListener('click', function () {
+            previewImage.src = ''; // set the image source to empty
+            removePhotoButton.style.display = 'none'; // hide the remove button
+            var removePhotoInput = document.createElement('input');
+            removePhotoInput.setAttribute('type', 'hidden');
+            removePhotoInput.setAttribute('name', 'RemovePhoto');
+            removePhotoInput.setAttribute('value', 'on');
+            document.querySelector('.post-form').appendChild(removePhotoInput);
+        });
+
+
+
+    </script>
+}
